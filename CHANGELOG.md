@@ -1,3 +1,7 @@
+## 0.1.0-2
+
+* Fixed README screenshot URLs to use `raw.githubusercontent.com` for better compatibility with pub.dev external image proxy rendering.
+
 ## 0.1.0-1
 
 * Improved rendering abstraction by introducing shared measure layout utilities used by `SheetMusicView` and `TablatureView`.
