@@ -1,6 +1,6 @@
 name: tenplum_music
 description: "A lightweight, vector-based music notation, tablature, interactive fretboard, and chord diagram suite for Flutter."
-version: 0.1.0
+version: 0.1.0-1
 homepage: https://github.com/tenplum/tenplum_music
 
 environment:
