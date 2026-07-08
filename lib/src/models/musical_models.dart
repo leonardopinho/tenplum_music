@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 enum Pitch {
   c4(-2, 'C4'),
   d4(-1, 'D4'),
@@ -42,16 +44,38 @@ class Note {
   final int? string;
   final int? fret; // Fret number (0 for open string)
 
-  const Note({this.pitch, required this.duration, required this.startBeat, this.string, this.fret});
+  const Note({
+    this.pitch,
+    required this.duration,
+    required this.startBeat,
+    this.string,
+    this.fret,
+  });
 
   bool get isRest => pitch == null && fret == null;
 
   @override
   String toString() {
     if (isRest) return 'Rest(${duration.name})';
-    if (fret != null && string != null) return 'TabNote(String: $string, Fret: $fret, ${duration.name})';
+    if (fret != null && string != null) {
+      return 'TabNote(String: $string, Fret: $fret, ${duration.name})';
+    }
     return 'Note(${pitch!.name}, ${duration.name})';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Note &&
+        other.pitch == pitch &&
+        other.duration == duration &&
+        other.startBeat == startBeat &&
+        other.string == string &&
+        other.fret == fret;
+  }
+
+  @override
+  int get hashCode => Object.hash(pitch, duration, startBeat, string, fret);
 }
 
 class Measure {
@@ -59,7 +83,24 @@ class Measure {
   final List<Note> notes;
   final double beatsPerMeasure; // Defaults to 4.0 (4/4 time signature)
 
-  const Measure({required this.number, required this.notes, this.beatsPerMeasure = 4.0});
+  const Measure({
+    required this.number,
+    required this.notes,
+    this.beatsPerMeasure = 4.0,
+  });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Measure &&
+        other.number == number &&
+        listEquals(other.notes, notes) &&
+        other.beatsPerMeasure == beatsPerMeasure;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(number, Object.hashAll(notes), beatsPerMeasure);
 }
 
 class ChordPlacement {
@@ -68,14 +109,28 @@ class ChordPlacement {
   final int? finger; // Optional: 1, 2, 3, 4
   final int? barreEndString;
 
-  const ChordPlacement({required this.string, required this.fret, this.finger, this.barreEndString});
+  const ChordPlacement({
+    required this.string,
+    required this.fret,
+    this.finger,
+    this.barreEndString,
+  });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ChordPlacement &&
+        other.string == string &&
+        other.fret == fret &&
+        other.finger == finger &&
+        other.barreEndString == barreEndString;
+  }
+
+  @override
+  int get hashCode => Object.hash(string, fret, finger, barreEndString);
 }
 
-enum ChordStringMarker {
-  none,
-  muted,
-  open,
-}
+enum ChordStringMarker { none, muted, open }
 
 class ChordDefinition {
   final String name; // e.g., "Dm7"
@@ -89,6 +144,51 @@ class ChordDefinition {
     required this.name,
     this.startFret = 1,
     required this.placements,
-    this.stringMarkers = const [ChordStringMarker.none, ChordStringMarker.none, ChordStringMarker.none, ChordStringMarker.none, ChordStringMarker.none, ChordStringMarker.none],
+    this.stringMarkers = const [
+      ChordStringMarker.none,
+      ChordStringMarker.none,
+      ChordStringMarker.none,
+      ChordStringMarker.none,
+      ChordStringMarker.none,
+      ChordStringMarker.none,
+    ],
   });
+
+  // High E (index 0) to Low E (index 5), with open markers inferred from fret-0 placements.
+  List<ChordStringMarker> get effectiveStringMarkers {
+    final resolved = List<ChordStringMarker>.filled(6, ChordStringMarker.none);
+
+    for (int i = 0; i < stringMarkers.length && i < 6; i++) {
+      resolved[i] = stringMarkers[i];
+    }
+
+    for (final placement in placements) {
+      if (placement.fret != 0) continue;
+      final markerIndex = placement.string - 1;
+      if (markerIndex < 0 || markerIndex >= 6) continue;
+      if (resolved[markerIndex] == ChordStringMarker.none) {
+        resolved[markerIndex] = ChordStringMarker.open;
+      }
+    }
+
+    return List.unmodifiable(resolved);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ChordDefinition &&
+        other.name == name &&
+        other.startFret == startFret &&
+        listEquals(other.placements, placements) &&
+        listEquals(other.stringMarkers, stringMarkers);
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    name,
+    startFret,
+    Object.hashAll(placements),
+    Object.hashAll(stringMarkers),
+  );
 }

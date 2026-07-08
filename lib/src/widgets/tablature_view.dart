@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tenplum_music/src/models/musical_models.dart';
+import 'package:tenplum_music/src/rendering/measure_layout.dart';
 import 'package:tenplum_music/src/rendering/tablature_painter.dart';
 
 class TablatureView extends StatelessWidget {
@@ -28,19 +29,26 @@ class TablatureView extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double finalWidth = width ?? (constraints.maxWidth.isInfinite ? 500.0 : constraints.maxWidth);
-        
-        // Dynamic height estimation based on line-wrapping:
-        // Margins = 32, start margin = 40, min width per measure = 140
+        final double finalWidth =
+            width ??
+            (constraints.maxWidth.isInfinite ? 500.0 : constraints.maxWidth);
+
         final double availableWidth = finalWidth - 32.0;
-        final double usableWidth = availableWidth - 40.0;
-        
-        int measuresPerLine = (usableWidth / 140.0).floor();
-        if (measuresPerLine < 1) measuresPerLine = 1;
-        
-        final int linesCount = (measures.length / measuresPerLine).ceil();
-        final double calculatedHeight = (linesCount * 120.0) + 40.0;
-        final double finalHeight = height > calculatedHeight ? height : calculatedHeight;
+
+        final layout = buildMeasureLayout(
+          measures: measures,
+          availableWidth: availableWidth,
+          leftMargin: 40.0,
+          minMeasureWidth: 140.0,
+        );
+
+        final double finalHeight =
+            RenderDimensionEstimator.estimateSystemHeight(
+              lineCount: layout.lineCount,
+              lineSpacing: 120.0,
+              extraPadding: 40.0,
+              minHeight: height,
+            );
 
         return SizedBox(
           width: finalWidth,

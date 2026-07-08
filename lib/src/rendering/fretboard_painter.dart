@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tenplum_music/src/widgets/custom_fretboard.dart';
 
@@ -19,6 +20,8 @@ class FretboardPainter extends CustomPainter {
 
   // Style customization
   final FretboardStyle style;
+
+  int get _firstDisplayedFret => startFret == 0 ? 1 : startFret;
 
   FretboardPainter({
     required this.strings,
@@ -46,7 +49,12 @@ class FretboardPainter extends CustomPainter {
     final int fretCount = endFret - startFret;
 
     // Draw Fretboard Wood Background
-    final Rect fretboardRect = Rect.fromLTWH(leftEdge, topMargin, fretboardWidth, fretboardHeight);
+    final Rect fretboardRect = Rect.fromLTWH(
+      leftEdge,
+      topMargin,
+      fretboardWidth,
+      fretboardHeight,
+    );
     final Paint woodPaint = Paint()
       ..color = style.woodColor
       ..style = PaintingStyle.fill;
@@ -57,7 +65,11 @@ class FretboardPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
     for (double y = topMargin + 4; y < topMargin + fretboardHeight; y += 8) {
-      canvas.drawLine(Offset(leftEdge, y), Offset(leftEdge + fretboardWidth, y), grainPaint);
+      canvas.drawLine(
+        Offset(leftEdge, y),
+        Offset(leftEdge + fretboardWidth, y),
+        grainPaint,
+      );
     }
 
     final Paint markerPaint = Paint()
@@ -65,7 +77,14 @@ class FretboardPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     for (int fret = startFret + 1; fret <= endFret; fret++) {
-      if (fret == 3 || fret == 5 || fret == 7 || fret == 9 || fret == 15 || fret == 17 || fret == 19 || fret == 21) {
+      if (fret == 3 ||
+          fret == 5 ||
+          fret == 7 ||
+          fret == 9 ||
+          fret == 15 ||
+          fret == 17 ||
+          fret == 19 ||
+          fret == 21) {
         double fretLeft = leftEdge + (fret - startFret - 1) * fretWidth;
         double dotX = fretLeft + (fretWidth / 2);
         double dotY = topMargin + (fretboardHeight / 2);
@@ -86,16 +105,24 @@ class FretboardPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
-    // Draw Nut (fret 0 line, thicker)
-    final Paint nutPaint = Paint()
+    // Draw Nut only when the rendered window includes open strings.
+    final Paint firstDividerPaint = Paint()
       ..color = style.fretWireColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.0;
-    canvas.drawLine(Offset(leftEdge, topMargin), Offset(leftEdge, topMargin + fretboardHeight), nutPaint);
+      ..strokeWidth = startFret == 0 ? 5.0 : 2.0;
+    canvas.drawLine(
+      Offset(leftEdge, topMargin),
+      Offset(leftEdge, topMargin + fretboardHeight),
+      firstDividerPaint,
+    );
 
     for (int i = 1; i <= fretCount; i++) {
       double x = leftEdge + i * fretWidth;
-      canvas.drawLine(Offset(x, topMargin), Offset(x, topMargin + fretboardHeight), fretPaint);
+      canvas.drawLine(
+        Offset(x, topMargin),
+        Offset(x, topMargin + fretboardHeight),
+        fretPaint,
+      );
     }
 
     // Draw Strings
@@ -111,7 +138,11 @@ class FretboardPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth;
 
-      canvas.drawLine(Offset(leftEdge, y), Offset(leftEdge + fretboardWidth, y), stringPaint);
+      canvas.drawLine(
+        Offset(leftEdge, y),
+        Offset(leftEdge + fretboardWidth, y),
+        stringPaint,
+      );
 
       if (showOpenStrings) {
         final Paint openStringPaint = Paint()
@@ -145,12 +176,17 @@ class FretboardPainter extends CustomPainter {
           if (fret == 0) {
             x = 10.0 + (openStringAreaWidth / 2);
           } else {
-            double fretLeft = leftEdge + (fret - startFret - 1) * fretWidth;
+            final double fretLeft =
+                leftEdge + (fret - _firstDisplayedFret) * fretWidth;
             x = fretLeft + (fretWidth / 2);
           }
 
-          bool isRoot = rootNote != null && CustomFretboard.areNotesEquivalent(noteAtFret, rootNote!);
-          Color markerColor = isRoot ? style.rootMarkerColor : style.markerColor;
+          bool isRoot =
+              rootNote != null &&
+              CustomFretboard.areNotesEquivalent(noteAtFret, rootNote!);
+          Color markerColor = isRoot
+              ? style.rootMarkerColor
+              : style.markerColor;
 
           final Paint markerPaint = Paint()
             ..color = markerColor
@@ -163,7 +199,10 @@ class FretboardPainter extends CustomPainter {
 
           double markerRadius = 14.0;
           if (isRoot) {
-            RRect rrect = RRect.fromRectAndRadius(Rect.fromCircle(center: Offset(x, y), radius: markerRadius), const Radius.circular(6.0));
+            RRect rrect = RRect.fromRectAndRadius(
+              Rect.fromCircle(center: Offset(x, y), radius: markerRadius),
+              const Radius.circular(6.0),
+            );
             canvas.drawRRect(rrect, markerPaint);
             canvas.drawRRect(rrect, borderPaint);
           } else {
@@ -188,12 +227,19 @@ class FretboardPainter extends CustomPainter {
           final textPainter = TextPainter(
             text: TextSpan(
               text: text,
-              style: TextStyle(color: style.noteTextColor, fontSize: 11.0, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: style.noteTextColor,
+                fontSize: 11.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             textDirection: TextDirection.ltr,
           );
           textPainter.layout();
-          textPainter.paint(canvas, Offset(x - textPainter.width / 2, y - textPainter.height / 2));
+          textPainter.paint(
+            canvas,
+            Offset(x - textPainter.width / 2, y - textPainter.height / 2),
+          );
         }
       }
     }
@@ -207,7 +253,8 @@ class FretboardPainter extends CustomPainter {
         if (tappedFret == 0) {
           x = 10.0 + (openStringAreaWidth / 2);
         } else {
-          double fretLeft = leftEdge + (tappedFret! - startFret - 1) * fretWidth;
+          final double fretLeft =
+              leftEdge + (tappedFret! - _firstDisplayedFret) * fretWidth;
           x = fretLeft + (fretWidth / 2);
         }
 
@@ -223,14 +270,16 @@ class FretboardPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant FretboardPainter oldDelegate) {
-    return oldDelegate.strings != strings ||
+    return !listEquals(oldDelegate.strings, strings) ||
         oldDelegate.startFret != startFret ||
         oldDelegate.endFret != endFret ||
-        oldDelegate.highlightedNotes != highlightedNotes ||
+        !listEquals(oldDelegate.highlightedNotes, highlightedNotes) ||
         oldDelegate.rootNote != rootNote ||
-        oldDelegate.noteDegrees != noteDegrees ||
+        !mapEquals(oldDelegate.noteDegrees, noteDegrees) ||
         oldDelegate.showDegrees != showDegrees ||
         oldDelegate.showOpenStrings != showOpenStrings ||
+        oldDelegate.fretWidth != fretWidth ||
+        oldDelegate.openStringAreaWidth != openStringAreaWidth ||
         oldDelegate.tappedString != tappedString ||
         oldDelegate.tappedFret != tappedFret ||
         oldDelegate.style != style;

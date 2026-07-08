@@ -14,7 +14,7 @@ Built entirely using native Canvas drawing (`CustomPainter`), eliminating any re
   
 * **Guitar Fretboard (`CustomFretboard`)**: Renders a realistic rosewood fretboard with scale markers, intervals, `O(1)` tap coordinates mapping, click callbacks (`onNoteTapped`), and customizable styles via `FretboardStyle`.
   
-* **Chord Diagrams (`ChordDiagramView`)**: Renders vertical chord charts with barre indicators, finger placements, and open (○) or muted (✕) string markers.
+* **Chord Diagrams (`ChordDiagramView`)**: Renders vertical chord charts with barre indicators, finger placements, and open (○) or muted (✕) string markers (explicit or inferred from `fret: 0`).
 
 ---
 
@@ -77,8 +77,8 @@ TablatureView(
     Measure(
       number: 1,
       notes: [
-        Note(pitch: Pitch.e3, string: 6, fret: 0, duration: NoteDuration.quarter, startBeat: 0.0), // Low E Open
-        Note(pitch: Pitch.g3, string: 6, fret: 3, duration: NoteDuration.quarter, startBeat: 1.0), // G (String 6 Fret 3)
+        Note(string: 6, fret: 0, duration: NoteDuration.quarter, startBeat: 0.0), // Low E Open
+        Note(string: 6, fret: 3, duration: NoteDuration.quarter, startBeat: 1.0), // G (String 6 Fret 3)
         Note(pitch: Pitch.c4, string: 5, fret: 3, duration: NoteDuration.quarter, startBeat: 2.0), // C (String 5 Fret 3)
       ],
     ),
@@ -124,7 +124,7 @@ CustomFretboard(
     fretWireColor: Color(0xFFB0BEC5),  // Silver frets
     markerColor: Colors.indigo,        // Scale notes marker fill
     rootMarkerColor: Colors.red,       // Root/tonic marker fill
-    glowColor: Colors.emerald,         // Active glow ring on click
+    glowColor: Color(0xFF10B981),      // Active glow ring on click
   ),
 )
 ```
@@ -137,6 +137,10 @@ CustomFretboard(
 
 ### 4. Chord Diagrams (`ChordDiagramView`)
 Renders standard vertical guitar chord charts with support for multiple configurations.
+
+`ChordDefinition` supports open strings in two equivalent ways:
+- Set `ChordStringMarker.open` in `stringMarkers`
+- Or provide `ChordPlacement(..., fret: 0)` and let `effectiveStringMarkers` infer the open marker
 
 ```dart
 ChordDiagramView(
@@ -179,6 +183,7 @@ All components use a shared, clean set of domain models located in `src/models/m
 *   **`NoteDuration`**: Rhythmic duration fraction mappings (e.g., `NoteDuration.whole` = 4 beats, `NoteDuration.quarter` = 1 beat).
 *   **`Note`**: Represents a note event (pitch, duration, start beat, string/fret).
 *   **`Measure`**: Groups notes together inside a numbered bar.
+*   **`ChordDefinition`**: Contains diagram placements and string markers, with `effectiveStringMarkers` resolving inferred open strings.
 
 ---
 

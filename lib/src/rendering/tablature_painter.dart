@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tenplum_music/src/models/musical_models.dart';
+import 'package:tenplum_music/src/rendering/measure_layout.dart';
 
 class TablaturePainter extends CustomPainter {
   final List<Measure> measures;
@@ -28,21 +30,16 @@ class TablaturePainter extends CustomPainter {
     final double availableWidth = endX - startX;
 
     // Layout configuration
-    const double leftMargin = 40.0; // Spacing at the start of each line for TAB label
+    const double leftMargin =
+        40.0; // Spacing at the start of each line for TAB label
     const double minMeasureWidth = 140.0;
-    final double usableWidth = availableWidth - leftMargin;
-
-    // Calculate measures per line
-    int measuresPerLine = (usableWidth / minMeasureWidth).floor();
-    if (measuresPerLine < 1) measuresPerLine = 1;
-
-    // Partition measures into lines
-    final List<List<Measure>> lines = [];
-    for (int i = 0; i < measures.length; i += measuresPerLine) {
-      int endIdx = i + measuresPerLine;
-      if (endIdx > measures.length) endIdx = measures.length;
-      lines.add(measures.sublist(i, endIdx));
-    }
+    final layout = buildMeasureLayout(
+      measures: measures,
+      availableWidth: availableWidth,
+      leftMargin: leftMargin,
+      minMeasureWidth: minMeasureWidth,
+    );
+    final lines = layout.lines;
 
     final Paint linePaint = Paint()
       ..color = lineColor
@@ -65,13 +62,21 @@ class TablaturePainter extends CustomPainter {
       final double halfOffset = (stringCount - 1) / 2.0;
       for (int i = 0; i < stringCount; i++) {
         double stringY = staffCenterY - (halfOffset - i) * stringSpacing;
-        canvas.drawLine(Offset(startX, stringY), Offset(endX, stringY), linePaint);
+        canvas.drawLine(
+          Offset(startX, stringY),
+          Offset(endX, stringY),
+          linePaint,
+        );
       }
 
       // Draw start vertical barline
       double topY = staffCenterY - halfOffset * stringSpacing;
       double bottomY = staffCenterY + halfOffset * stringSpacing;
-      canvas.drawLine(Offset(startX, topY), Offset(startX, bottomY), barlinePaint);
+      canvas.drawLine(
+        Offset(startX, topY),
+        Offset(startX, bottomY),
+        barlinePaint,
+      );
 
       // Draw "TAB" Label
       final TextPainter tabPainter = TextPainter(
@@ -98,7 +103,8 @@ class TablaturePainter extends CustomPainter {
 
       for (int mIdx = 0; mIdx < lineMeasures.length; mIdx++) {
         final Measure measure = lineMeasures[mIdx];
-        final double measureStartX = startX + leftMargin + (mIdx * measureWidth);
+        final double measureStartX =
+            startX + leftMargin + (mIdx * measureWidth);
         final double measureEndX = measureStartX + measureWidth;
 
         // Draw barline at the end of the measure
@@ -109,7 +115,8 @@ class TablaturePainter extends CustomPainter {
         );
 
         // Draw double barline for last measure
-        final bool isLastMeasure = (lineIdx == lines.length - 1) && (mIdx == lineMeasures.length - 1);
+        final bool isLastMeasure =
+            (lineIdx == lines.length - 1) && (mIdx == lineMeasures.length - 1);
         if (isLastMeasure) {
           canvas.drawLine(
             Offset(measureEndX - 4, topY),
@@ -127,11 +134,13 @@ class TablaturePainter extends CustomPainter {
 
           // Calculate horizontal note x position
           final double beatRatio = note.startBeat / measure.beatsPerMeasure;
-          final double noteX = measureStartX + 20.0 + beatRatio * (measureWidth - 40.0);
+          final double noteX =
+              measureStartX + 20.0 + beatRatio * (measureWidth - 40.0);
 
           // Calculate vertical position (string 1 at top, string 6 at bottom)
           final int stringIndex = note.string! - 1;
-          final double noteY = staffCenterY - (halfOffset - stringIndex) * stringSpacing;
+          final double noteY =
+              staffCenterY - (halfOffset - stringIndex) * stringSpacing;
 
           // Draw a masking circle to erase the line under the number
           final Paint maskPaint = Paint()
@@ -154,7 +163,10 @@ class TablaturePainter extends CustomPainter {
           fretPainter.layout();
           fretPainter.paint(
             canvas,
-            Offset(noteX - fretPainter.width / 2, noteY - fretPainter.height / 2),
+            Offset(
+              noteX - fretPainter.width / 2,
+              noteY - fretPainter.height / 2,
+            ),
           );
         }
       }
@@ -163,7 +175,7 @@ class TablaturePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant TablaturePainter oldDelegate) {
-    return oldDelegate.measures != measures ||
+    return !listEquals(oldDelegate.measures, measures) ||
         oldDelegate.lineColor != lineColor ||
         oldDelegate.numberColor != numberColor ||
         oldDelegate.backgroundColor != backgroundColor ||

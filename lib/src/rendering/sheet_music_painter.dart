@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tenplum_music/src/models/musical_models.dart';
+import 'package:tenplum_music/src/rendering/measure_layout.dart';
 import 'package:tenplum_music/src/rendering/music_glyphs.dart';
 
 class SheetMusicPainter extends CustomPainter {
@@ -25,21 +27,16 @@ class SheetMusicPainter extends CustomPainter {
     final double availableWidth = endX - startX;
 
     // Layout configuration
-    const double leftMargin = 60.0; // Spacing at the start of each line for clef
+    const double leftMargin =
+        60.0; // Spacing at the start of each line for clef
     const double minMeasureWidth = 140.0;
-    final double usableWidth = availableWidth - leftMargin;
-
-    // Calculate how many measures fit on a single system line
-    int measuresPerLine = (usableWidth / minMeasureWidth).floor();
-    if (measuresPerLine < 1) measuresPerLine = 1;
-
-    // Partition measures into lines
-    final List<List<Measure>> lines = [];
-    for (int i = 0; i < measures.length; i += measuresPerLine) {
-      int endIdx = i + measuresPerLine;
-      if (endIdx > measures.length) endIdx = measures.length;
-      lines.add(measures.sublist(i, endIdx));
-    }
+    final layout = buildMeasureLayout(
+      measures: measures,
+      availableWidth: availableWidth,
+      leftMargin: leftMargin,
+      minMeasureWidth: minMeasureWidth,
+    );
+    final lines = layout.lines;
 
     final Paint linePaint = Paint()
       ..color = lineColor
@@ -66,7 +63,11 @@ class SheetMusicPainter extends CustomPainter {
       // Draw start vertical barline
       double topY = staffCenterY - 2 * staffSpaceSize;
       double bottomY = staffCenterY + 2 * staffSpaceSize;
-      canvas.drawLine(Offset(startX, topY), Offset(startX, bottomY), barlinePaint);
+      canvas.drawLine(
+        Offset(startX, topY),
+        Offset(startX, bottomY),
+        barlinePaint,
+      );
 
       // Draw Treble Clef
       canvas.save();
@@ -86,7 +87,8 @@ class SheetMusicPainter extends CustomPainter {
 
       for (int mIdx = 0; mIdx < lineMeasures.length; mIdx++) {
         final Measure measure = lineMeasures[mIdx];
-        final double measureStartX = startX + leftMargin + (mIdx * measureWidth);
+        final double measureStartX =
+            startX + leftMargin + (mIdx * measureWidth);
         final double measureEndX = measureStartX + measureWidth;
 
         // Draw barline at the end of the measure
@@ -97,7 +99,8 @@ class SheetMusicPainter extends CustomPainter {
         );
 
         // If this is the very last measure in the piece, draw a double barline
-        final bool isLastMeasure = (lineIdx == lines.length - 1) && (mIdx == lineMeasures.length - 1);
+        final bool isLastMeasure =
+            (lineIdx == lines.length - 1) && (mIdx == lineMeasures.length - 1);
         if (isLastMeasure) {
           canvas.drawLine(
             Offset(measureEndX - 4, topY),
@@ -114,7 +117,8 @@ class SheetMusicPainter extends CustomPainter {
           // Calculate horizontal x position proportional to startBeat
           final double beatRatio = note.startBeat / measure.beatsPerMeasure;
           // Leave some margins inside the measure
-          final double noteX = measureStartX + 20.0 + beatRatio * (measureWidth - 40.0);
+          final double noteX =
+              measureStartX + 20.0 + beatRatio * (measureWidth - 40.0);
 
           if (note.isRest) {
             // Draw Rest
@@ -133,13 +137,15 @@ class SheetMusicPainter extends CustomPainter {
             final Pitch pitch = note.pitch!;
             // Vertical position based on step formula:
             // S = 4 is middle line (B4), S = 0 is bottom line (E4)
-            final double noteY = staffCenterY - (pitch.step - 4) * (staffSpaceSize / 2);
+            final double noteY =
+                staffCenterY - (pitch.step - 4) * (staffSpaceSize / 2);
 
             // Draw Ledger Lines (if note is below C4 or above A5)
             if (pitch.step <= -2) {
               // Bottom ledger lines (e.g. C4 at step -2)
               for (int stepIdx = -2; stepIdx >= pitch.step; stepIdx -= 2) {
-                double ledgerY = staffCenterY - (stepIdx - 4) * (staffSpaceSize / 2);
+                double ledgerY =
+                    staffCenterY - (stepIdx - 4) * (staffSpaceSize / 2);
                 canvas.drawLine(
                   Offset(noteX - 10, ledgerY),
                   Offset(noteX + 10, ledgerY),
@@ -149,7 +155,8 @@ class SheetMusicPainter extends CustomPainter {
             } else if (pitch.step >= 10) {
               // Top ledger lines (e.g. A5 at step 10)
               for (int stepIdx = 10; stepIdx <= pitch.step; stepIdx += 2) {
-                double ledgerY = staffCenterY - (stepIdx - 4) * (staffSpaceSize / 2);
+                double ledgerY =
+                    staffCenterY - (stepIdx - 4) * (staffSpaceSize / 2);
                 canvas.drawLine(
                   Offset(noteX - 10, ledgerY),
                   Offset(noteX + 10, ledgerY),
@@ -159,7 +166,9 @@ class SheetMusicPainter extends CustomPainter {
             }
 
             // Draw Note Head (filled for quarter/eighth/sixteenth, open for whole/half)
-            final bool filled = note.duration != NoteDuration.whole && note.duration != NoteDuration.half;
+            final bool filled =
+                note.duration != NoteDuration.whole &&
+                note.duration != NoteDuration.half;
             MusicGlyphs.paintNoteHead(
               canvas,
               noteX,
@@ -172,10 +181,16 @@ class SheetMusicPainter extends CustomPainter {
             // Draw Stem (vertical line) if duration is shorter than a whole note
             if (note.duration != NoteDuration.whole) {
               final double stemHeight = staffSpaceSize * 3.5;
-              final bool stemUp = pitch.step < 4; // Stem up for notes below middle line, down otherwise
-              
-              final double stemX = stemUp ? noteX + (staffSpaceSize * 0.6) : noteX - (staffSpaceSize * 0.6);
-              final double stemEndY = stemUp ? noteY - stemHeight : noteY + stemHeight;
+              final bool stemUp =
+                  pitch.step <
+                  4; // Stem up for notes below middle line, down otherwise
+
+              final double stemX = stemUp
+                  ? noteX + (staffSpaceSize * 0.6)
+                  : noteX - (staffSpaceSize * 0.6);
+              final double stemEndY = stemUp
+                  ? noteY - stemHeight
+                  : noteY + stemHeight;
 
               final Paint stemPaint = Paint()
                 ..color = noteColor
@@ -189,11 +204,12 @@ class SheetMusicPainter extends CustomPainter {
               );
 
               // Draw flag if note is eighth/sixteenth
-              if (note.duration == NoteDuration.eighth || note.duration == NoteDuration.sixteenth) {
+              if (note.duration == NoteDuration.eighth ||
+                  note.duration == NoteDuration.sixteenth) {
                 final double flagX = stemX;
                 final double flagStartY = stemEndY;
                 final double flagDirectionY = stemUp ? 1 : -1;
-                
+
                 final Path flagPath = Path()
                   ..moveTo(flagX, flagStartY)
                   ..quadraticBezierTo(
@@ -233,7 +249,7 @@ class SheetMusicPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant SheetMusicPainter oldDelegate) {
-    return oldDelegate.measures != measures ||
+    return !listEquals(oldDelegate.measures, measures) ||
         oldDelegate.lineColor != lineColor ||
         oldDelegate.noteColor != noteColor ||
         oldDelegate.staffSpaceSize != staffSpaceSize;

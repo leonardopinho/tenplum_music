@@ -21,6 +21,32 @@ class FretboardStyle {
     this.glowColor = const Color(0xFF10B981),
     this.inlayDotColor = const Color(0x99B0BEC5), // grey/silver inlay dots
   });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is FretboardStyle &&
+        other.woodColor == woodColor &&
+        other.fretWireColor == fretWireColor &&
+        other.stringColor == stringColor &&
+        other.markerColor == markerColor &&
+        other.rootMarkerColor == rootMarkerColor &&
+        other.noteTextColor == noteTextColor &&
+        other.glowColor == glowColor &&
+        other.inlayDotColor == inlayDotColor;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    woodColor,
+    fretWireColor,
+    stringColor,
+    markerColor,
+    rootMarkerColor,
+    noteTextColor,
+    glowColor,
+    inlayDotColor,
+  );
 }
 
 class CustomFretboard extends StatefulWidget {
@@ -50,10 +76,32 @@ class CustomFretboard extends StatefulWidget {
   });
 
   static const List<String> _chromaticSharps = [
-    'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'
+    'C',
+    'C#',
+    'D',
+    'D#',
+    'E',
+    'F',
+    'F#',
+    'G',
+    'G#',
+    'A',
+    'A#',
+    'B',
   ];
   static const List<String> _chromaticFlats = [
-    'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'
+    'C',
+    'Db',
+    'D',
+    'Eb',
+    'E',
+    'F',
+    'Gb',
+    'G',
+    'Ab',
+    'A',
+    'Bb',
+    'B',
   ];
 
   static String normalize(String note) {
@@ -76,12 +124,16 @@ class CustomFretboard extends StatefulWidget {
   }
 
   static String getNoteAt(String openNote, int fret) {
-    int openIdx = _chromaticSharps.indexWhere((n) => areNotesEquivalent(n, openNote));
+    int openIdx = _chromaticSharps.indexWhere(
+      (n) => areNotesEquivalent(n, openNote),
+    );
     if (openIdx == -1) {
-      openIdx = _chromaticFlats.indexWhere((n) => areNotesEquivalent(n, openNote));
+      openIdx = _chromaticFlats.indexWhere(
+        (n) => areNotesEquivalent(n, openNote),
+      );
     }
     if (openIdx == -1) return openNote;
-    
+
     int targetIdx = (openIdx + fret) % 12;
     return _chromaticSharps[targetIdx];
   }
@@ -94,12 +146,17 @@ class _CustomFretboardState extends State<CustomFretboard> {
   int? _tappedString;
   int? _tappedFret;
 
+  bool get _showOpenStringsOnCanvas =>
+      widget.showOpenStrings && widget.startFret == 0;
+
+  int get _firstDisplayedFret => widget.startFret == 0 ? 1 : widget.startFret;
+
   void _handleTap(TapUpDetails details) {
     final double localX = details.localPosition.dx;
     final double localY = details.localPosition.dy;
 
     final double fretWidth = 80.0;
-    final double openStringAreaWidth = widget.showOpenStrings ? 60.0 : 0.0;
+    final double openStringAreaWidth = _showOpenStringsOnCanvas ? 60.0 : 0.0;
     final double leftEdge = openStringAreaWidth + 20.0;
     final double topMargin = 20.0;
     final double bottomMargin = 20.0;
@@ -110,7 +167,7 @@ class _CustomFretboardState extends State<CustomFretboard> {
     final int stringCount = visualStrings.length;
     final double stringSpacing = fretboardHeight / (stringCount - 1);
 
-    // 1. Resolve String Index (visual top stringIdx = 0 corresponds to String 6, bottom is String 1)
+    // Resolve visual string index to canonical numbering (1 = high E, 6 = low E).
     final double relativeY = localY - topMargin;
     final double stringIdxDouble = relativeY / stringSpacing;
     final int stringIdx = stringIdxDouble.round().clamp(0, stringCount - 1);
@@ -118,11 +175,11 @@ class _CustomFretboardState extends State<CustomFretboard> {
 
     // 2. Resolve Fret
     int tappedFret = -1;
-    if (widget.showOpenStrings && localX >= 20.0 && localX < leftEdge) {
+    if (_showOpenStringsOnCanvas && localX >= 20.0 && localX < leftEdge) {
       tappedFret = 0; // Open string
     } else if (localX >= leftEdge) {
       final double relativeX = localX - leftEdge;
-      tappedFret = widget.startFret + (relativeX / fretWidth).floor() + 1;
+      tappedFret = _firstDisplayedFret + (relativeX / fretWidth).floor();
     }
 
     if (tappedFret >= widget.startFret && tappedFret <= widget.endFret) {
@@ -144,8 +201,9 @@ class _CustomFretboardState extends State<CustomFretboard> {
   Widget build(BuildContext context) {
     final double fretWidth = 80.0;
     final int fretCount = widget.endFret - widget.startFret;
-    final double openStringAreaWidth = widget.showOpenStrings ? 60.0 : 0.0;
-    final double totalWidth = openStringAreaWidth + (fretCount * fretWidth) + 40.0;
+    final double openStringAreaWidth = _showOpenStringsOnCanvas ? 60.0 : 0.0;
+    final double totalWidth =
+        openStringAreaWidth + (fretCount * fretWidth) + 40.0;
     const double height = 240.0;
 
     final List<String> visualStrings = List.from(widget.tuning.reversed);
@@ -168,7 +226,7 @@ class _CustomFretboardState extends State<CustomFretboard> {
               rootNote: widget.rootNote,
               noteDegrees: widget.noteDegrees,
               showDegrees: widget.showDegrees,
-              showOpenStrings: widget.showOpenStrings,
+              showOpenStrings: _showOpenStringsOnCanvas,
               fretWidth: fretWidth,
               openStringAreaWidth: openStringAreaWidth,
               tappedString: _tappedString,
