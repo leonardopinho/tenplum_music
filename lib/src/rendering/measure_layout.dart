@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:tenplum_music/src/models/musical_models.dart';
+import 'package:templum_music/src/models/musical_models.dart';
 
 class MeasureLayout {
   final int measuresPerLine;

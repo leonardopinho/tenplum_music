@@ -1,4 +1,4 @@
-# Tenplum Music
+# Templum Music
 
 A lightweight, declarative, and vector-based music notation, tablature, interactive fretboard, and chord diagram rendering suite for Flutter.
 
@@ -26,14 +26,14 @@ Add the package dependency to your `pubspec.yaml` file:
 dependencies:
   flutter:
     sdk: flutter
-  tenplum_music:
-    path: /path/to/tenplum_music_lib
+  templum_music:
+    path: /path/to/templum_music_lib
 ```
 
 Import the library in your Dart code:
 
 ```dart
-import 'package:tenplum_music/tenplum_music.dart';
+import 'package:templum_music/templum_music.dart';
 ```
 
 ---
@@ -64,7 +64,7 @@ SheetMusicView(
 
 **Preview:**
 
-![Sheet Music](https://raw.githubusercontent.com/leonardopinho/tenplum_music/main/doc/screenshots/sheet_music.png)
+![Sheet Music](https://raw.githubusercontent.com/leonardopinho/templum_music/main/doc/screenshots/sheet_music.png)
 
 ---
 
@@ -92,7 +92,7 @@ TablatureView(
 
 **Preview:**
 
-![Tablature](https://raw.githubusercontent.com/leonardopinho/tenplum_music/main/doc/screenshots/tablature.png)
+![Tablature](https://raw.githubusercontent.com/leonardopinho/templum_music/main/doc/screenshots/tablature.png)
 
 ---
 
@@ -131,7 +131,7 @@ CustomFretboard(
 
 **Preview:**
 
-![Interactive Fretboard](https://raw.githubusercontent.com/leonardopinho/tenplum_music/main/doc/screenshots/fretboard.png)
+![Interactive Fretboard](https://raw.githubusercontent.com/leonardopinho/templum_music/main/doc/screenshots/fretboard.png)
 
 ---
 
@@ -171,7 +171,7 @@ ChordDiagramView(
 
 **Preview:**
 
-![Chord Diagrams](https://raw.githubusercontent.com/leonardopinho/tenplum_music/main/doc/screenshots/chords.png)
+![Chord Diagrams](https://raw.githubusercontent.com/leonardopinho/templum_music/main/doc/screenshots/chords.png)
 
 ---
 
@@ -204,7 +204,7 @@ See the [`LICENSE`](LICENSE) file for details.
 When using this library, please keep the original copyright and license notice:
 
 ```text
-    Tenplum Music Tools
+    Templum Music Tools
     Copyright (c) 2026 Leonardo Pinho
     Licensed under the Apache License, Version 2.0
 ```

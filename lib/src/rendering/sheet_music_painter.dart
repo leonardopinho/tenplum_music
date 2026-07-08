@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tenplum_music/src/models/musical_models.dart';
-import 'package:tenplum_music/src/rendering/measure_layout.dart';
-import 'package:tenplum_music/src/rendering/music_glyphs.dart';
+import 'package:templum_music/src/models/musical_models.dart';
+import 'package:templum_music/src/rendering/measure_layout.dart';
+import 'package:templum_music/src/rendering/music_glyphs.dart';
 
 class SheetMusicPainter extends CustomPainter {
   final List<Measure> measures;

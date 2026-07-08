@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tenplum_music/src/models/musical_models.dart';
-import 'package:tenplum_music/src/rendering/measure_layout.dart';
-import 'package:tenplum_music/src/rendering/tablature_painter.dart';
+import 'package:templum_music/src/models/musical_models.dart';
+import 'package:templum_music/src/rendering/measure_layout.dart';
+import 'package:templum_music/src/rendering/tablature_painter.dart';
 
 class TablatureView extends StatelessWidget {
   final List<Measure> measures;

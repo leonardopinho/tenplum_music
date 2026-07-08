@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tenplum_music/tenplum_music.dart';
+import 'package:templum_music/templum_music.dart';
 
 void main() {
-  group('tenplum_music Package Tests', () {
+  group('templum_music Package Tests', () {
     test('Pitch mapping resolves correct steps for treble clef', () {
       expect(Pitch.c4.step, equals(-2)); // Middle C
       expect(Pitch.e4.step, equals(0)); // Bottom line

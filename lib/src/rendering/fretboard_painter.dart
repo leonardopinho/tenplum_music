@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tenplum_music/src/widgets/custom_fretboard.dart';
+import 'package:templum_music/src/widgets/custom_fretboard.dart';
 
 class FretboardPainter extends CustomPainter {
   final List<String> strings;

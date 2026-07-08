@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tenplum_music/src/models/musical_models.dart';
-import 'package:tenplum_music/src/rendering/measure_layout.dart';
+import 'package:templum_music/src/models/musical_models.dart';
+import 'package:templum_music/src/rendering/measure_layout.dart';
 
 class TablaturePainter extends CustomPainter {
   final List<Measure> measures;

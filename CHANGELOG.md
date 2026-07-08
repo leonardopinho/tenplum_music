@@ -1,3 +1,8 @@
+## 0.1.2
+
+* Renamed package references to `templum_music` across code, example, and documentation.
+* Updated user-facing branding text to "Templum Music".
+
 ## 0.1.1
 
 * Finalized release metadata and documentation updates for the 0.1.x line.

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tenplum_music/src/rendering/fretboard_painter.dart';
+import 'package:templum_music/src/rendering/fretboard_painter.dart';
 
 class FretboardStyle {
   final Color woodColor;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tenplum_music/src/models/musical_models.dart';
-import 'package:tenplum_music/src/rendering/chord_diagram_painter.dart';
+import 'package:templum_music/src/models/musical_models.dart';
+import 'package:templum_music/src/rendering/chord_diagram_painter.dart';
 
 class ChordDiagramView extends StatelessWidget {
   final ChordDefinition chord;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tenplum_music/src/models/musical_models.dart';
+import 'package:templum_music/src/models/musical_models.dart';
 
 class ChordDiagramPainter extends CustomPainter {
   final ChordDefinition chord;
