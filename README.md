@@ -64,7 +64,7 @@ SheetMusicView(
 
 **Preview:**
 
-![Sheet Music](https://github.com/leonardopinho/tenplum_music/blob/main/doc/screenshots/sheet_music.png)
+![Sheet Music](https://raw.githubusercontent.com/leonardopinho/tenplum_music/main/doc/screenshots/sheet_music.png)
 
 ---
 
@@ -92,7 +92,7 @@ TablatureView(
 
 **Preview:**
 
-![Tablature](https://github.com/leonardopinho/tenplum_music/blob/main/doc/screenshots/tablature.png)
+![Tablature](https://raw.githubusercontent.com/leonardopinho/tenplum_music/main/doc/screenshots/tablature.png)
 
 ---
 
@@ -131,7 +131,7 @@ CustomFretboard(
 
 **Preview:**
 
-![Interactive Fretboard](https://github.com/leonardopinho/tenplum_music/blob/main/doc/screenshots/fretboard.png)
+![Interactive Fretboard](https://raw.githubusercontent.com/leonardopinho/tenplum_music/main/doc/screenshots/fretboard.png)
 
 ---
 
@@ -171,7 +171,7 @@ ChordDiagramView(
 
 **Preview:**
 
-![Chord Diagrams](https://github.com/leonardopinho/tenplum_music/blob/main/doc/screenshots/chords.png)
+![Chord Diagrams](https://raw.githubusercontent.com/leonardopinho/tenplum_music/main/doc/screenshots/chords.png)
 
 ---
 
