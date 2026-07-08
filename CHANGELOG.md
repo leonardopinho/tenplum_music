@@ -1,3 +1,7 @@
+## 0.1.1
+
+* Finalized release metadata and documentation updates for the 0.1.x line.
+
 ## 0.1.0-2
 
 * Fixed README screenshot URLs to use `raw.githubusercontent.com` for better compatibility with pub.dev external image proxy rendering.
